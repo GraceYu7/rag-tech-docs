@@ -18,7 +18,7 @@ title: RAG 流程解析
 
 ## 完整流程拆解
 
-RAG 的完整流程可以分为**离线的数据准备**和在线的**检索与生成**两个阶段。
+1. RAG 的完整流程可以分为**离线的数据准备**和在线的**检索与生成**两个阶段。
 
 ```mermaid
 graph TD
@@ -40,6 +40,70 @@ graph TD
         K --> L[大语言模型 LLM]
         L --> M[生成最终回答与引用]
     end
+```
+
+2. RAG系统架构图
+
+```mermaid
+flowchart LR
+    %% 定义节点样式
+    classDef process fill:#fff,stroke:#333,stroke-width:2px;
+    classDef document fill:#f9f9f9,stroke:#333,stroke-width:2px;
+    classDef model fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
+    classDef db fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
+    classDef llm fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
+
+    %% 数据准备阶段（上半部分，从左到右）
+    subgraph Data_Preparation [数据准备阶段]
+        direction LR
+        Doc[本地文件<br/>可以是结构化数据（二维表）<br/>非结构化文本（PDF、Word、TXT等格式）]:::document
+        Loader[非结构化数据加载器<br/>Unstructured Loader]:::process
+        Text[Text]:::process
+        Splitter[文本切分<br/>Text Splitter]:::process
+        Chunk[Text Chunk]:::process
+        EmbedModel1[嵌入模型<br/>Embedding Model]:::model
+        VecEmbed1[向量嵌入<br/>Vector Embeddings]:::process
+        
+        Doc --> Loader
+        Loader --> Text
+        Text --> Splitter
+        Splitter --> Chunk
+        Chunk --> EmbedModel1
+        EmbedModel1 -->|转换为| VecEmbed1
+    end
+
+    %% 向量数据库（跨阶段连接）
+    VectorDB[(向量数据库<br/>Vector Database)]:::db
+
+    %% 检索与生成阶段（下半部分，同样横向流动）
+    subgraph Retrieval_Generation [检索与生成阶段]
+        direction LR
+        UserQuery[User Query]:::process
+        EmbedModel2[嵌入模型<br/>Embedding Model]:::model
+        VecEmbed2[向量嵌入<br/>Vector Embeddings]:::process
+        
+        SimilarSearch[向量数据库中的相似向量<br/>作为上下文Context]:::process
+        PromptTemplate[提示词模板<br/>Prompt Template]:::process
+        Prompt[提示词Prompt<br/>Prompt = Context + User Query]:::process
+        LLM[LLM]:::llm
+        Answer[回答<br/>Answer]:::process
+        
+        UserQuery --> EmbedModel2
+        EmbedModel2 -->|转换为| VecEmbed2
+        VecEmbed2 -->|相似度搜索<br/>Similarity Search| SimilarSearch
+        SimilarSearch --> PromptTemplate
+        PromptTemplate --> Prompt
+        Prompt -->|提问| LLM
+        LLM --> Answer
+        Answer -.->|发送给用户| UserQuery
+    end
+
+    %% 连接数据准备和向量数据库
+    VecEmbed1 -->|存储 & 索引<br/>Store & Index| VectorDB
+    VectorDB -.->|检索| SimilarSearch
+
+    %% 调整布局样式
+    linkStyle default stroke:#333,stroke-width:2px;
 ```
 
 ## 各阶段详解
