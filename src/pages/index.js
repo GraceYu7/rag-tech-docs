@@ -16,13 +16,13 @@ function HomepageHeader() {
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
-            to="/docs/02-快速开始/quickstart">
+            to="/docs/快速开始/quickstart">
             🚀 5 分钟快速开始
           </Link>
           <Link
             className="button button--outline button--secondary button--lg"
             style={{marginLeft: '1rem'}}
-            to="/docs/01-概览/intro">
+            to="/docs/概览/intro">
             📖 阅读项目介绍
           </Link>
         </div>
