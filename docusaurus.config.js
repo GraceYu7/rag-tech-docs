@@ -6,10 +6,17 @@ const config = {
   tagline: '技术文档 + API 文档 + RAG Demo',
   favicon: 'img/logo.ico',
 
+  /** 更改为使用 Vercel 部署文档站点
   // 这里设置为你的 GitHub Pages 地址
   url: 'https://graceyu7.github.io',
   // 仓库名，必须以 / 开头和结尾
   baseUrl: '/rag-tech-docs/',
+  */
+
+   // 这里设置为你的 Vercel 地址
+  url: 'https://rag-tech-docs.vercel.app',
+  // 仓库名，必须以 / 开头和结尾
+  baseUrl: '/',
 
   // GitHub 部署配置
   organizationName: 'GraceYu7', // 你的 GitHub 用户名
